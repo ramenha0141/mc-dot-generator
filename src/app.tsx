@@ -1,5 +1,5 @@
 import { valibotResolver } from '@hookform/resolvers/valibot';
-import { ArrowDownToLineIcon, Loader2 } from 'lucide-react';
+import { ArrowDownToLineIcon, GithubIcon, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as v from 'valibot';
@@ -24,6 +24,7 @@ import {
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
 import { Switch } from '~/components/ui/switch';
+import { cn } from '~/lib/utils';
 
 import * as blockRegistry from './lib/blocks';
 import { type RGB, colorDistance, getBlockColor } from './lib/color';
@@ -370,6 +371,33 @@ export function App() {
 					</CardFooter>
 				</Card>
 			)}
+
+			<div className='flex items-center gap-2'>
+				<a
+					href='https://github.com/ramenha0141/mc-dot-generator'
+					className={cn(
+						buttonVariants({
+							variant: 'link',
+						}),
+						'p-0 text-foreground',
+					)}
+				>
+					<GithubIcon />
+					Repository
+				</a>
+				<p>/</p>
+				<a
+					href='https://github.com/ramenha0141'
+					className={cn(
+						buttonVariants({
+							variant: 'link',
+						}),
+						'p-0 text-foreground',
+					)}
+				>
+					ramenha0141
+				</a>
+			</div>
 		</main>
 	);
 }
