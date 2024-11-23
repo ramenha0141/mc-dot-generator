@@ -194,7 +194,7 @@ export function App() {
 	}
 
 	return (
-		<main className='mx-auto grid max-w-[48rem] gap-8 bg-background p-8'>
+		<main className='mx-auto grid max-w-[48rem] gap-8 bg-background px-4 py-8'>
 			<div className='mx-auto flex flex-wrap items-center justify-center gap-2 font-bold text-2xl'>
 				<div className='flex gap-2'>
 					<img src='/favicon.webp' className='h-8' />
@@ -330,7 +330,7 @@ export function App() {
 			</Card>
 
 			{output && (
-				<Card>
+				<Card className='min-w-0'>
 					<CardHeader>
 						<CardTitle>出力</CardTitle>
 						<CardDescription>
@@ -357,7 +357,7 @@ export function App() {
 							className={buttonVariants()}
 						>
 							<ArrowDownToLineIcon />
-							画像をダウンロード
+							画像<span className='hidden sm:inline'>をダウンロード</span>
 						</a>
 						<a
 							href={output.schematicUrl}
@@ -365,7 +365,7 @@ export function App() {
 							className={buttonVariants()}
 						>
 							<ArrowDownToLineIcon />
-							設計図をダウンロード
+							設計図<span className='hidden sm:inline'>をダウンロード</span>
 						</a>
 					</CardFooter>
 				</Card>
