@@ -1,58 +1,25 @@
 import { valibotResolver } from '@hookform/resolvers/valibot';
-import { ArrowDownToLineIcon, GithubIcon, Loader2 } from 'lucide-react';
+import { GithubIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as v from 'valibot';
 
-import {
-	Accordion,
-	AccordionContent,
-	AccordionItem,
-	AccordionTrigger,
-} from '~/components/ui/accordion';
-import { Button, buttonVariants } from '~/components/ui/button';
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from '~/components/ui/card';
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from '~/components/ui/form';
-import { Input } from '~/components/ui/input';
-import { Switch } from '~/components/ui/switch';
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from '~/components/ui/table';
-import { cn, formatBlockAmount } from '~/lib/utils';
+import { OutputCard } from '~/components/output';
+import { buttonVariants } from '~/components/ui/button';
+import * as blockRegistry from '~/lib/blocks';
+import { type RGB, colorDistance, getBlockColor } from '~/lib/color';
+import { readAsImage } from '~/lib/file';
+import { generateLitematicaSchematic } from '~/lib/litematica';
+import { Palette } from '~/lib/palette';
+import { resizeImage } from '~/lib/resize';
+import { TextureLoader } from '~/lib/texture';
+import { cn } from '~/lib/utils';
 
-import * as blockRegistry from './lib/blocks';
-import { type RGB, colorDistance, getBlockColor } from './lib/color';
-import { readAsImage } from './lib/file';
-import { generateLitematicaSchematic } from './lib/litematica';
-import { Palette } from './lib/palette';
-import { resizeImage } from './lib/resize';
-import { TextureLoader } from './lib/texture';
-
+import { OptionsCard } from './components/options';
 import RenderWorker from './render-worker?worker';
+import type { Output, Status } from './types';
 
 const textureLoader = new TextureLoader();
-
-const widthPresets = [64, 96, 128, 192, 256];
 
 const formSchema = v.object({
 	image: v.instance(File, '画像を選択してください'),
@@ -66,17 +33,6 @@ const formSchema = v.object({
 	name: v.optional(v.string()),
 });
 
-interface Output {
-	name: string;
-	width: number;
-	height: number;
-	total: number;
-	totalTypes: number;
-	materialList: { id: string; amount: number }[];
-	schematicUrl: string;
-	imageUrl: string;
-}
-
 export function App() {
 	const form = useForm<v.InferInput<typeof formSchema>>({
 		resolver: valibotResolver(formSchema),
@@ -85,9 +41,7 @@ export function App() {
 			useMetalBlocks: true,
 		},
 	});
-	const [status, setStatus] = useState<
-		'idle' | 'transform' | 'schematic' | 'render'
-	>('idle');
+	const [status, setStatus] = useState<Status>('idle');
 	const [output, setOutput] = useState<Output | null>(null);
 
 	async function onSubmit(options: v.InferInput<typeof formSchema>) {
@@ -234,204 +188,13 @@ export function App() {
 				</div>
 			</div>
 
-			<Card>
-				<CardHeader>
-					<CardTitle>設定</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
-							<FormField
-								control={form.control}
-								name='image'
-								render={({ field: { value, onChange, ...field } }) => (
-									<FormItem>
-										<FormLabel>画像</FormLabel>
-										<FormControl>
-											<Input
-												type='file'
-												accept='image/*'
-												className='cursor-pointer'
-												onChange={e => {
-													onChange(e.target.files?.[0]);
-												}}
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='width'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>横幅</FormLabel>
-										<div className='flex gap-1'>
-											<FormControl>
-												<Input type='number' className='grow' {...field} />
-											</FormControl>
-											<div className='shrink-0'>
-												{widthPresets.map(width => (
-													<Button
-														key={width}
-														type='button'
-														variant='link'
-														className='px-1.5'
-														onClick={() => field.onChange(width.toString())}
-													>
-														{width}
-													</Button>
-												))}
-											</div>
-										</div>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='useMetalBlocks'
-								render={({ field: { value, onChange, ...field } }) => (
-									<FormItem>
-										<FormLabel>鉱石系のブロックを使用する</FormLabel>
-										<FormDescription>
-											鉄ブロック, 金ブロック, ダイアモンドブロックなど
-										</FormDescription>
-										<FormControl>
-											<Switch
-												checked={value}
-												onCheckedChange={onChange}
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='name'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>
-											名前
-											<span className='font-normal text-muted-foreground'>
-												（オプション）
-											</span>
-										</FormLabel>
-										<FormDescription>ファイルダウンロード用</FormDescription>
-										<FormControl>
-											<Input
-												placeholder={
-													form.getValues('image')?.name.split('.')[0]
-												}
-												autoComplete='off'
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
+			<OptionsCard status={status} form={form} onSubmit={onSubmit} />
 
-							<div className='flex items-center gap-4'>
-								<Button type='submit' disabled={status !== 'idle'}>
-									{status !== 'idle' && <Loader2 className='animate-spin' />}
-									変換
-								</Button>
-								<p className='font-bold text-muted-foreground text-sm'>
-									{
-										{
-											idle: null,
-											transform: '変換中...',
-											schematic: '出力中...',
-											render: '描画中...',
-										}[status]
-									}
-								</p>
-							</div>
-						</form>
-					</Form>
-				</CardContent>
-			</Card>
-
-			{output && (
-				<Card className='min-w-0'>
-					<CardHeader>
-						<CardTitle>出力</CardTitle>
-						<CardDescription>
-							出力サイズ：{output.width}x{output.height}, ブロック：
-							{output.total}, ブロックの種類：{output.totalTypes}
-						</CardDescription>
-					</CardHeader>
-					<CardContent className='space-y-4'>
-						<img
-							id='rendered'
-							className='w-[stretch]'
-							src={output.imageUrl}
-							onLoad={e =>
-								e.currentTarget.parentElement!.parentElement!.scrollIntoView({
-									behavior: 'smooth',
-								})
-							}
-						/>
-						<Accordion type='single' collapsible>
-							<AccordionItem value='material-list'>
-								<AccordionTrigger>ブロックリスト</AccordionTrigger>
-								<AccordionContent>
-									<Table className='font-mono'>
-										<TableHeader>
-											<TableRow>
-												<TableHead>ID</TableHead>
-												<TableHead>ブロック数</TableHead>
-											</TableRow>
-										</TableHeader>
-										<TableBody>
-											{output.materialList.map(({ id, amount }) => (
-												<TableRow key={id}>
-													<TableCell>{id}</TableCell>
-													<TableCell>
-														{amount}{' '}
-														<span className='text-muted-foreground'>
-															({formatBlockAmount(amount)})
-														</span>
-													</TableCell>
-												</TableRow>
-											))}
-										</TableBody>
-									</Table>
-								</AccordionContent>
-							</AccordionItem>
-						</Accordion>
-					</CardContent>
-					<CardFooter className='flex gap-4'>
-						<a
-							href={output.imageUrl}
-							download={`${output.name}.png`}
-							className={buttonVariants()}
-						>
-							<ArrowDownToLineIcon />
-							<p>
-								画像<span className='hidden sm:inline'>をダウンロード</span>
-							</p>
-						</a>
-						<a
-							href={output.schematicUrl}
-							download={`${output.name}.litematic`}
-							className={buttonVariants()}
-						>
-							<ArrowDownToLineIcon />
-							<p>
-								設計図<span className='hidden sm:inline'>をダウンロード</span>
-							</p>
-						</a>
-					</CardFooter>
-				</Card>
-			)}
+			{output && <OutputCard output={output} />}
 
 			<div className='flex items-center gap-2'>
+				<p className='font-bold'>v{__VERSION__}</p>
+				<p>/</p>
 				<a
 					href='https://github.com/ramenha0141/mc-dot-generator'
 					className={cn(
