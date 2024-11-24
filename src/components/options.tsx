@@ -5,6 +5,7 @@ import type { formSchema } from '~/form-schema';
 import type { Status } from '~/types';
 
 import { Loader2 } from 'lucide-react';
+import { cn } from '~/lib/utils';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import {
@@ -19,7 +20,7 @@ import {
 import { Input } from './ui/input';
 import { Switch } from './ui/switch';
 
-const widthPresets = [64, 96, 128, 192, 256];
+const widthPresets = ['64', '96', '128', '192', '256'];
 
 export function OptionsCard({
 	status,
@@ -75,8 +76,11 @@ export function OptionsCard({
 													key={width}
 													type='button'
 													variant='link'
-													className='px-1.5'
-													onClick={() => field.onChange(width.toString())}
+													className={cn(
+														'px-1 sm:px-1.5',
+														field.value === width && 'underline',
+													)}
+													onClick={() => field.onChange(width)}
 												>
 													{width}
 												</Button>

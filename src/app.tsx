@@ -192,7 +192,7 @@ export function App() {
 
 			{output && <OutputCard output={output} />}
 
-			<div className='flex items-center gap-2'>
+			<div className='flex items-center justify-center gap-2'>
 				<p className='font-bold'>v{__VERSION__}</p>
 				<p>/</p>
 				<a
