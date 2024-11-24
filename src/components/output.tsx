@@ -1,6 +1,7 @@
 import { ArrowDownToLineIcon } from 'lucide-react';
 import { useRef } from 'react';
 
+import { formatBlockAmount } from '~/lib/utils';
 import type { Output } from '~/types';
 
 import { MaterialList } from './material-list';
@@ -28,8 +29,12 @@ export function OutputCard({ output }: { output: Output }) {
 			<CardHeader>
 				<CardTitle>出力</CardTitle>
 				<CardDescription>
-					出力サイズ：{output.width}x{output.height}, ブロック：
-					{output.total}, ブロックの種類：{output.totalTypes}
+					出力サイズ：{output.width}x{output.height}, ブロック数：
+					{output.total}{' '}
+					<span className='text-muted-foreground'>
+						({formatBlockAmount(output.total)})
+					</span>
+					, ブロックの種類：{output.totalTypes}
 				</CardDescription>
 			</CardHeader>
 			<CardContent className='space-y-4'>
