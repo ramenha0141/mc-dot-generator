@@ -201,7 +201,7 @@ export function App() {
 						buttonVariants({
 							variant: 'link',
 						}),
-						'p-0 text-foreground',
+						'gap-1 p-0 text-foreground',
 					)}
 				>
 					<GithubIcon />
