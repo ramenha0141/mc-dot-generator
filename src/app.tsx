@@ -358,7 +358,9 @@ export function App() {
 							className={buttonVariants()}
 						>
 							<ArrowDownToLineIcon />
-							画像<span className='hidden sm:inline'>をダウンロード</span>
+							<p>
+								画像<span className='hidden sm:inline'>をダウンロード</span>
+							</p>
 						</a>
 						<a
 							href={output.schematicUrl}
@@ -366,7 +368,9 @@ export function App() {
 							className={buttonVariants()}
 						>
 							<ArrowDownToLineIcon />
-							設計図<span className='hidden sm:inline'>をダウンロード</span>
+							<p>
+								設計図<span className='hidden sm:inline'>をダウンロード</span>
+							</p>
 						</a>
 					</CardFooter>
 				</Card>
