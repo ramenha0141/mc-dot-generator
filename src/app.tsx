@@ -4,6 +4,12 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as v from 'valibot';
 
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from '~/components/ui/accordion';
 import { Button, buttonVariants } from '~/components/ui/button';
 import {
 	Card,
@@ -24,7 +30,15 @@ import {
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
 import { Switch } from '~/components/ui/switch';
-import { cn } from '~/lib/utils';
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from '~/components/ui/table';
+import { cn, formatBlockAmount } from '~/lib/utils';
 
 import * as blockRegistry from './lib/blocks';
 import { type RGB, colorDistance, getBlockColor } from './lib/color';
@@ -58,6 +72,7 @@ interface Output {
 	height: number;
 	total: number;
 	totalTypes: number;
+	materialList: { id: string; amount: number }[];
 	schematicUrl: string;
 	imageUrl: string;
 }
@@ -137,6 +152,17 @@ export function App() {
 			}
 		}
 
+		const materialArray = new Array<number>(palette.data.size).fill(0);
+
+		for (const block of blocks) {
+			materialArray[block]++;
+		}
+
+		const materialList = Array.from(palette.data.entries())
+			.slice(1)
+			.map(([id, i]) => ({ id, amount: materialArray[i] }))
+			.toSorted((a, b) => b.amount - a.amount);
+
 		setStatus('schematic');
 
 		const name = options.name ?? options.image.name.split('.')[0];
@@ -187,6 +213,7 @@ export function App() {
 				height,
 				total: size,
 				totalTypes: palette.data.size - 1,
+				materialList,
 				schematicUrl,
 				imageUrl,
 			};
@@ -339,7 +366,7 @@ export function App() {
 							{output.total}, ブロックの種類：{output.totalTypes}
 						</CardDescription>
 					</CardHeader>
-					<CardContent>
+					<CardContent className='space-y-4'>
 						<img
 							id='rendered'
 							className='w-[stretch]'
@@ -350,6 +377,34 @@ export function App() {
 								})
 							}
 						/>
+						<Accordion type='single' collapsible>
+							<AccordionItem value='material-list'>
+								<AccordionTrigger>ブロックリスト</AccordionTrigger>
+								<AccordionContent>
+									<Table className='font-mono'>
+										<TableHeader>
+											<TableRow>
+												<TableHead>ID</TableHead>
+												<TableHead>ブロック数</TableHead>
+											</TableRow>
+										</TableHeader>
+										<TableBody>
+											{output.materialList.map(({ id, amount }) => (
+												<TableRow key={id}>
+													<TableCell>{id}</TableCell>
+													<TableCell>
+														{amount}{' '}
+														<span className='text-muted-foreground'>
+															({formatBlockAmount(amount)})
+														</span>
+													</TableCell>
+												</TableRow>
+											))}
+										</TableBody>
+									</Table>
+								</AccordionContent>
+							</AccordionItem>
+						</Accordion>
 					</CardContent>
 					<CardFooter className='flex gap-4'>
 						<a
