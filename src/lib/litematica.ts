@@ -9,12 +9,15 @@ import {
 	NbtString,
 } from 'deepslate';
 
+import { Direction } from '~/form-schema';
+
 import type { Palette } from './palette';
 
 interface Options {
 	name: string;
 	width: number;
 	height: number;
+	direction: Direction;
 	palette: Palette;
 	blocks: Uint8Array;
 }
@@ -23,15 +26,22 @@ export function generateLitematicaSchematic({
 	name,
 	width,
 	height,
+	direction,
 	palette,
 	blocks,
 }: Options) {
 	const time = BigInt(new Date().getTime());
 	const total = blocks.length;
-	const size = new NbtCompound()
-		.set('x', new NbtInt(width))
-		.set('y', new NbtInt(height))
-		.set('z', new NbtInt(1));
+	const size =
+		direction === Direction.Horizontal
+			? new NbtCompound()
+					.set('x', new NbtInt(width))
+					.set('y', new NbtInt(1))
+					.set('z', new NbtInt(height))
+			: new NbtCompound()
+					.set('x', new NbtInt(width))
+					.set('y', new NbtInt(height))
+					.set('z', new NbtInt(1));
 	const paletteArray = Array.from(palette.data.entries());
 	const emptyList = new NbtList();
 
@@ -39,12 +49,22 @@ export function generateLitematicaSchematic({
 	const blockStates = new BigUint64Array(Math.ceil((total * bit) / 64));
 	const view = new BitView(blockStates.buffer);
 
-	for (let i = 0; i < total; i++) {
-		const block = blocks[i];
-		const x = i % width;
-		const y = Math.floor(i / width);
+	if (direction === Direction.Horizontal) {
+		for (let i = 0; i < total; i++) {
+			const block = blocks[i];
+			const x = i % width;
+			const y = Math.floor(i / width);
 
-		view.setBits(bit * (x + width * (height - y - 1)), block, bit);
+			view.setBits(bit * (x + width * y), block, bit);
+		}
+	} else {
+		for (let i = 0; i < total; i++) {
+			const block = blocks[i];
+			const x = i % width;
+			const y = Math.floor(i / width);
+
+			view.setBits(bit * (x + width * (height - y - 1)), block, bit);
+		}
 	}
 
 	const nbt = new NbtCompound()

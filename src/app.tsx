@@ -2,7 +2,7 @@ import { valibotResolver } from '@hookform/resolvers/valibot';
 import { GithubIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import * as v from 'valibot';
+import type * as v from 'valibot';
 
 import { OutputCard } from '~/components/output';
 import { buttonVariants } from '~/components/ui/button';
@@ -16,29 +16,21 @@ import { TextureLoader } from '~/lib/texture';
 import { cn } from '~/lib/utils';
 
 import { OptionsCard } from './components/options';
+import { Direction, formSchema } from './form-schema';
 import RenderWorker from './render-worker?worker';
 import type { Output, Status } from './types';
 
 const textureLoader = new TextureLoader();
 
-const formSchema = v.object({
-	image: v.instance(File, '画像を選択してください'),
-	width: v.pipe(
-		v.string('横幅を指定してください'),
-		v.transform(input => Number.parseInt(input)),
-		v.integer('横幅を整数で設定してください'),
-		v.minValue(1, '横幅を1以上で設定してください'),
-	),
-	useMetalBlocks: v.boolean(),
-	name: v.optional(v.string()),
-});
-
 export function App() {
-	const form = useForm<v.InferInput<typeof formSchema>>({
+	const form = useForm<v.InferOutput<typeof formSchema>>({
 		resolver: valibotResolver(formSchema),
 		defaultValues: {
-			width: '128',
+			image: undefined,
+			width: 128,
 			useMetalBlocks: true,
+			direction: Direction.Vertical,
+			name: '',
 		},
 	});
 	const [status, setStatus] = useState<Status>('idle');
@@ -69,6 +61,7 @@ export function App() {
 		const image = await readAsImage(options.image);
 		const width = Number.parseInt(options.width);
 		const height = Math.round((image.height / image.width) * width);
+		const direction = options.direction;
 		const resizedImage = resizeImage(image, width, height);
 		const size = width * height;
 		const colorMapArray = Array.from(colorMap.entries());
@@ -124,6 +117,7 @@ export function App() {
 			name,
 			width,
 			height,
+			direction,
 			palette,
 			blocks,
 		});

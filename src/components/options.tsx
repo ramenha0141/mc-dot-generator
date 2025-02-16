@@ -1,11 +1,11 @@
+import { Loader2 } from 'lucide-react';
 import type { UseFormReturn } from 'react-hook-form';
 import type { InferInput } from 'valibot';
 
-import type { formSchema } from '~/form-schema';
+import { Direction, type formSchema } from '~/form-schema';
+import { cn } from '~/lib/utils';
 import type { Status } from '~/types';
 
-import { Loader2 } from 'lucide-react';
-import { cn } from '~/lib/utils';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import {
@@ -18,6 +18,13 @@ import {
 	FormMessage,
 } from './ui/form';
 import { Input } from './ui/input';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from './ui/select';
 import { Switch } from './ui/switch';
 
 const widthPresets = ['64', '96', '128', '192', '256'];
@@ -108,6 +115,29 @@ export function OptionsCard({
 										/>
 									</FormControl>
 									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name='direction'
+							render={({ field: { onChange, ...field } }) => (
+								<FormItem>
+									<FormLabel>方向</FormLabel>
+									<FormControl>
+										<Select
+											onValueChange={value => onChange(value as Direction)}
+											{...field}
+										>
+											<SelectTrigger>
+												<SelectValue />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value={Direction.Horizontal}>横</SelectItem>
+												<SelectItem value={Direction.Vertical}>縦</SelectItem>
+											</SelectContent>
+										</Select>
+									</FormControl>
 								</FormItem>
 							)}
 						/>

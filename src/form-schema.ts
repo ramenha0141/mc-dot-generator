@@ -1,5 +1,10 @@
 import * as v from 'valibot';
 
+export enum Direction {
+	Horizontal = 'horizontal',
+	Vertical = 'vertical',
+}
+
 export const formSchema = v.object({
 	image: v.instance(File, '画像を選択してください'),
 	width: v.pipe(
@@ -9,5 +14,6 @@ export const formSchema = v.object({
 		v.minValue(1, '横幅を1以上で設定してください'),
 	),
 	useMetalBlocks: v.boolean(),
+	direction: v.enum(Direction, '方向を選択してください'),
 	name: v.optional(v.string()),
 });
