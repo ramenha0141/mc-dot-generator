@@ -1,6 +1,6 @@
 import { Loader2 } from 'lucide-react';
 import type { UseFormReturn } from 'react-hook-form';
-import type { InferInput } from 'valibot';
+import type { InferInput, InferOutput } from 'valibot';
 
 import { Direction, type formSchema } from '~/form-schema';
 import { cn } from '~/lib/utils';
@@ -27,7 +27,7 @@ import {
 } from './ui/select';
 import { Switch } from './ui/switch';
 
-const widthPresets = ['64', '96', '128', '192', '256'];
+const widthPresets = [64, 96, 128, 192, 256];
 
 export function OptionsCard({
 	status,
@@ -35,8 +35,8 @@ export function OptionsCard({
 	onSubmit,
 }: {
 	status: Status;
-	form: UseFormReturn<InferInput<typeof formSchema>>;
-	onSubmit: (options: InferInput<typeof formSchema>) => void;
+	form: UseFormReturn<InferOutput<typeof formSchema>>;
+	onSubmit: (options: InferOutput<typeof formSchema>) => void;
 }) {
 	return (
 		<Card>

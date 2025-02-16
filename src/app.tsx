@@ -36,7 +36,7 @@ export function App() {
 	const [status, setStatus] = useState<Status>('idle');
 	const [output, setOutput] = useState<Output | null>(null);
 
-	async function onSubmit(options: v.InferInput<typeof formSchema>) {
+	async function onSubmit(options: v.InferOutput<typeof formSchema>) {
 		setStatus('transform');
 
 		const textureMap = new Map<string, ImageData>();
@@ -59,7 +59,7 @@ export function App() {
 		}
 
 		const image = await readAsImage(options.image);
-		const width = Number.parseInt(options.width);
+		const width = options.width;
 		const height = Math.round((image.height / image.width) * width);
 		const direction = options.direction;
 		const resizedImage = resizeImage(image, width, height);
