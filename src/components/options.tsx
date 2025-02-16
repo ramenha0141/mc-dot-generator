@@ -1,6 +1,6 @@
 import { Loader2 } from 'lucide-react';
 import type { UseFormReturn } from 'react-hook-form';
-import type { InferInput, InferOutput } from 'valibot';
+import type { InferOutput } from 'valibot';
 
 import { Direction, type formSchema } from '~/form-schema';
 import { cn } from '~/lib/utils';
