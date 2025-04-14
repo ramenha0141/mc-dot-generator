@@ -1,6 +1,6 @@
 import { Loader2 } from 'lucide-react';
 import type { UseFormReturn } from 'react-hook-form';
-import type { InferOutput } from 'valibot';
+import type { InferInput, InferOutput } from 'valibot';
 
 import { Direction, type formSchema } from '~/form-schema';
 import { cn } from '~/lib/utils';
@@ -27,7 +27,7 @@ import {
 } from './ui/select';
 import { Switch } from './ui/switch';
 
-const widthPresets = [64, 96, 128, 192, 256];
+const widthPresets = [64, 96, 128, 192, 256].map((n) => n.toString());
 
 export function OptionsCard({
 	status,
@@ -35,7 +35,7 @@ export function OptionsCard({
 	onSubmit,
 }: {
 	status: Status;
-	form: UseFormReturn<InferOutput<typeof formSchema>>;
+	form: UseFormReturn<InferInput<typeof formSchema>>;
 	onSubmit: (options: InferOutput<typeof formSchema>) => void;
 }) {
 	return (
@@ -45,19 +45,22 @@ export function OptionsCard({
 			</CardHeader>
 			<CardContent>
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+					<form
+						onSubmit={form.handleSubmit(onSubmit as unknown as any)}
+						className="space-y-4"
+					>
 						<FormField
 							control={form.control}
-							name='image'
+							name="image"
 							render={({ field: { value, onChange, ...field } }) => (
 								<FormItem>
 									<FormLabel>画像</FormLabel>
 									<FormControl>
 										<Input
-											type='file'
-											accept='image/*'
-											className='cursor-pointer'
-											onChange={e => {
+											type="file"
+											accept="image/*"
+											className="cursor-pointer"
+											onChange={(e) => {
 												onChange(e.target.files?.[0]);
 											}}
 											{...field}
@@ -69,23 +72,23 @@ export function OptionsCard({
 						/>
 						<FormField
 							control={form.control}
-							name='width'
+							name="width"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>横幅</FormLabel>
-									<div className='flex gap-1'>
+									<div className="flex gap-1">
 										<FormControl>
-											<Input type='number' className='grow' {...field} />
+											<Input type="number" className="grow" {...field} />
 										</FormControl>
-										<div className='shrink-0'>
-											{widthPresets.map(width => (
+										<div className="shrink-0">
+											{widthPresets.map((width) => (
 												<Button
 													key={width}
-													type='button'
-													variant='link'
+													type="button"
+													variant="link"
 													className={cn(
 														'px-1 sm:px-1.5',
-														field.value === width && 'underline',
+														field.value === width && 'underline'
 													)}
 													onClick={() => field.onChange(width)}
 												>
@@ -100,7 +103,7 @@ export function OptionsCard({
 						/>
 						<FormField
 							control={form.control}
-							name='useMetalBlocks'
+							name="useMetalBlocks"
 							render={({ field: { value, onChange, ...field } }) => (
 								<FormItem>
 									<FormLabel>鉱石系のブロックを使用する</FormLabel>
@@ -120,13 +123,13 @@ export function OptionsCard({
 						/>
 						<FormField
 							control={form.control}
-							name='direction'
+							name="direction"
 							render={({ field: { onChange, ...field } }) => (
 								<FormItem>
 									<FormLabel>方向</FormLabel>
 									<FormControl>
 										<Select
-											onValueChange={value => onChange(value as Direction)}
+											onValueChange={(value) => onChange(value as Direction)}
 											{...field}
 										>
 											<SelectTrigger>
@@ -143,12 +146,12 @@ export function OptionsCard({
 						/>
 						<FormField
 							control={form.control}
-							name='name'
+							name="name"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>
 										名前
-										<span className='font-normal text-muted-foreground'>
+										<span className="font-normal text-muted-foreground">
 											（オプション）
 										</span>
 									</FormLabel>
@@ -156,7 +159,7 @@ export function OptionsCard({
 									<FormControl>
 										<Input
 											placeholder={form.getValues('image')?.name.split('.')[0]}
-											autoComplete='off'
+											autoComplete="off"
 											{...field}
 										/>
 									</FormControl>
@@ -165,12 +168,12 @@ export function OptionsCard({
 							)}
 						/>
 
-						<div className='flex items-center gap-4'>
-							<Button type='submit' disabled={status !== 'idle'}>
-								{status !== 'idle' && <Loader2 className='animate-spin' />}
+						<div className="flex items-center gap-4">
+							<Button type="submit" disabled={status !== 'idle'}>
+								{status !== 'idle' && <Loader2 className="animate-spin" />}
 								変換
 							</Button>
-							<p className='font-bold text-muted-foreground text-sm'>
+							<p className="font-bold text-muted-foreground text-sm">
 								{
 									{
 										idle: null,

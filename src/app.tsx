@@ -23,11 +23,11 @@ import type { Output, Status } from './types';
 const textureLoader = new TextureLoader();
 
 export function App() {
-	const form = useForm<v.InferOutput<typeof formSchema>>({
+	const form = useForm<v.InferInput<typeof formSchema>>({
 		resolver: valibotResolver(formSchema),
 		defaultValues: {
 			image: undefined,
-			width: 128,
+			width: '128',
 			useMetalBlocks: true,
 			direction: Direction.Vertical,
 			name: '',
@@ -37,6 +37,8 @@ export function App() {
 	const [output, setOutput] = useState<Output | null>(null);
 
 	async function onSubmit(options: v.InferOutput<typeof formSchema>) {
+		console.log(options);
+
 		setStatus('transform');
 
 		const textureMap = new Map<string, ImageData>();
@@ -47,7 +49,7 @@ export function App() {
 
 			let blocks = Object.values(blockRegistry).flat();
 			if (!options.useMetalBlocks) {
-				blocks = blocks.filter(id => !blockRegistry.metal.includes(id));
+				blocks = blocks.filter((id) => !blockRegistry.metal.includes(id));
 			}
 			for (const id of blocks) {
 				const texture = textureLoader.getTexture(id);
@@ -92,7 +94,7 @@ export function App() {
 					{
 						id: '',
 						distance: Number.POSITIVE_INFINITY,
-					},
+					}
 				).id;
 
 				blocks[i] = palette.get(nearestBlockId);
@@ -142,14 +144,14 @@ export function App() {
 					blocks,
 					textureMap: renderTextureMap,
 				},
-				[blocks.buffer, ...renderTextureMap.values()],
+				[blocks.buffer, ...renderTextureMap.values()]
 			);
 		}
-		const imageUrl = await new Promise<string>(resolve => {
+		const imageUrl = await new Promise<string>((resolve) => {
 			worker.onmessage = (e: MessageEvent<string>) => resolve(e.data);
 		});
 
-		setOutput(old => {
+		setOutput((old) => {
 			if (old) {
 				URL.revokeObjectURL(old.schematicUrl);
 				URL.revokeObjectURL(old.imageUrl);
@@ -170,15 +172,15 @@ export function App() {
 	}
 
 	return (
-		<main className='mx-auto grid max-w-[48rem] gap-8 bg-background px-4 py-8'>
-			<div className='mx-auto flex flex-wrap items-center justify-center gap-2 font-bold text-2xl'>
-				<div className='flex gap-2'>
-					<img src='/favicon.webp' className='h-8' />
+		<main className="mx-auto grid max-w-[48rem] gap-8 bg-background px-4 py-8">
+			<div className="mx-auto flex flex-wrap items-center justify-center gap-2 font-bold text-2xl">
+				<div className="flex gap-2">
+					<img src="/favicon.webp" className="h-8" />
 					<h1>Minecraft壁画生成</h1>
 				</div>
-				<div className='flex gap-2'>
-					<p className='text-muted-foreground'>/</p>
-					<p className='text-muted-foreground'>dot.chamame.org</p>
+				<div className="flex gap-2">
+					<p className="text-muted-foreground">/</p>
+					<p className="text-muted-foreground">dot.chamame.org</p>
 				</div>
 			</div>
 
@@ -186,16 +188,16 @@ export function App() {
 
 			{output && <OutputCard output={output} />}
 
-			<div className='flex items-center justify-center gap-2'>
-				<p className='font-bold'>v{__VERSION__}</p>
+			<div className="flex items-center justify-center gap-2">
+				<p className="font-bold">v{__VERSION__}</p>
 				<p>/</p>
 				<a
-					href='https://github.com/ramenha0141/mc-dot-generator'
+					href="https://github.com/ramenha0141/mc-dot-generator"
 					className={cn(
 						buttonVariants({
 							variant: 'link',
 						}),
-						'gap-1 p-0 text-foreground',
+						'gap-1 p-0 text-foreground'
 					)}
 				>
 					<GithubIcon />
@@ -203,12 +205,12 @@ export function App() {
 				</a>
 				<p>/</p>
 				<a
-					href='https://github.com/ramenha0141'
+					href="https://github.com/ramenha0141"
 					className={cn(
 						buttonVariants({
 							variant: 'link',
 						}),
-						'p-0 text-foreground',
+						'p-0 text-foreground'
 					)}
 				>
 					ramenha0141
